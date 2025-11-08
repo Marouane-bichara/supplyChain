@@ -13,7 +13,6 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProductionOrderDTO {
-    private Long idOrder;
 
     @NotNull(message = "Product is required")
     private Long product_id;

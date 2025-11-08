@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(name = "/api/Bill-Off-Material")
+@RequestMapping("/api/Bill-Off-Material")
 public class BillOfMaterialController {
 
     private final IBillOfMaterialService billOfMaterialService;

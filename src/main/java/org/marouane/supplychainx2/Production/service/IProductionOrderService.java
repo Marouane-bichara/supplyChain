@@ -9,14 +9,14 @@ public interface IProductionOrderService {
 
     ProductionOrderDTOResponse createProductionOrder(ProductionOrderDTO productionOrderDTO);
 
-    ProductionOrderDTOResponse updateProductionOrder(Long id, ProductionOrderDTO productionOrderDTO);
-
-    void deleteProductionOrder(Long id);
-
-    ProductionOrderDTOResponse getProductionOrderById(Long id);
-
-    List<ProductionOrderDTOResponse> getAllProductionOrders();
-
-    List<ProductionOrderDTOResponse> getProductionOrdersByStatus(String status);
+//    ProductionOrderDTOResponse updateProductionOrder(Long id, ProductionOrderDTO productionOrderDTO);
+//
+//    void deleteProductionOrder(Long id);
+//
+//    ProductionOrderDTOResponse getProductionOrderById(Long id);
+//
+//    List<ProductionOrderDTOResponse> getAllProductionOrders();
+//
+//    List<ProductionOrderDTOResponse> getProductionOrdersByStatus(String status);
 
 }
