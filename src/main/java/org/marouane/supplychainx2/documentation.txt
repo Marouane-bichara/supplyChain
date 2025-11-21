@@ -1,0 +1,289 @@
+DOCUMENTATION SPRING SECURITY
+
+
+Authentication vs Authorization :
+
+Authentication : It is the process of verifying the identity of a user.
+Authorization : It is the process of checking permissions or roles to see what authenticated users can access.
+
+
+Brute Force Attack :
+The attacker tries many passwords automatically until one works.
+Protection in Spring Security :
+Limit login attempts
+Add captcha
+Use strong passwords
+Add account lock after several failed logins
+
+XSS :
+Attacker injects malicious JavaScript into your pages.
+Protection in Spring Security :
+HTML escaping
+
+
+Sanitizing inputs
+
+
+Using frameworks that escape by default (like Thymeleaf)
+
+
+CSRF (Cross-Site Request Forgery)
+Attacker tricks an authenticated user to execute an unwanted action.
+ Protection in Spring Security :
+Spring Security enables CSRF tokens by default for forms.
+
+Session Fixation :
+Attacker forces the user to use a known session ID, then steals it.
+Example :
+Attacker creates a session with ID: ABC123
+
+
+Attacker sends the session ID to the victim
+
+
+Victim logs in using that same session
+
+
+Attacker reuses the session ID to access the account
+
+Protection in Spring Security :
+Spring Security automatically changes the session ID after login.
+
+Session Hijacking (Vol de session) :
+Attacker steals an active session ID (cookie) and uses it to become the user.
+Methods used :
+Sniffing HTTP (no HTTPS)
+
+
+XSS to steal cookies
+
+
+Malware
+
+
+Man-in-the-middle interception
+Protection in Spring Security :
+Use HTTPS
+
+
+Use secure cookies
+
+
+Short session timeout
+
+
+Regenerate session ID
+
+Why HTTPS Is Important (For Spring Security & Any Web App)
+Data Encryption :
+Without HTTPS (HTTP):
+Passwords
+
+
+Emails
+
+
+Tokens
+
+
+Cookies
+
+
+Personal data
+
+
+…can be read easily by anyone on the network.
+
+With HTTPS:
+Data becomes unreadable for attackers.
+
+
+Even if someone intercepts it, it looks like random text.
+
+Protection Against Man-in-the-Middle Attacks (MITM) :
+Without HTTPS, an attacker can stay between you and the server and:
+Read your data
+
+
+Modify it
+
+
+Inject malicious scripts
+
+
+HTTPS ensures:
+The communication is secure
+
+
+The attacker cannot modify it
+
+Prevents Session Hijacking :
+
+Without HTTPS:
+Cookies (session IDs) are sent in plain text
+
+
+Attackers can steal them with tools like Wireshark
+
+
+They can log in as YOU
+
+
+HTTPS encrypts cookies → preventing session theft.
+
+Ensures Server Authenticity (Trust)  :
+HTTPS uses certificates issued by trusted authorities.
+
+Better Search Ranking (SEO) :
+Google ranks HTTPS websites higher than HTTP websites.
+
+Required for Modern Features :
+Certain browser features only work with HTTPS:
+Service Workers
+
+
+Push Notifications
+
+
+Geolocation API
+
+
+Camera / Microphone access
+
+Defense in Depth (Modern Security Principle) :
+Defense in Depth means:
+👉 You don’t rely on one single security measure.
+👉 You add multiple layers of security so if one layer fails, another one protects you.
+
+Goal of Defense in Depth :
+To make attacks:
+harder
+
+
+slower
+
+
+more expensive
+
+
+more detectable
+
+The 5 Main Layers (in Web & Spring Security) :
+Network Security Layer :
+Protect the infrastructure.
+Examples:
+Firewalls
+
+
+VPN
+
+
+HTTPS
+
+
+Reverse proxy (Nginx)
+
+
+Limiting open ports
+
+Application Security Layer :
+Protect the backend and the code.
+Examples in Spring Boot:
+Authentication (login)
+
+
+Authorization (roles/permissions)
+
+
+Input validation
+
+
+Protection against XSS, CSRF, SQL Injection
+
+
+Strong password hashing (BCrypt)
+
+ Data Security Layer
+Protect the data even if someone gets into the system.
+Examples:
+Encrypt sensitive data in the database
+
+
+Secure secrets (environment variables)
+
+
+Encrypt backups
+
+
+Restrict database user permissions
+
+User Security Layer
+Educate and protect users.
+Examples:
+Strong passwords
+
+
+Multi-Factor Authentication (MFA)
+
+
+Avoiding phishing attacks
+
+
+Session timeouts
+
+
+When you make a request (for example, to create a supplier), the client includes the credentials in the HTTP
+
+Authorization: Basic <base64(email:password)>
+email:password is Base64-encoded.
+
+email = test@example.com
+password = password123
+"test@example.com:password123" → base64 → dGVzdEBleGFtcGxlLmNvbTpwYXNzd29yZDEyMw==
+
+Authorization: Basic dGVzdEBleGFtcGxlLmNvbTpwYXNzd29yZDEyMw==
+
+Takes the Authorization header.
+
+
+Decodes Base64 → gets email and password in plain text.
+
+
+Calls your UserDetailsService to load the user by email:
+
+
+User appUser = accountService.loadUserByUserEmail(email);
+
+If no user is found → authentication fails (401 Unauthorized).
+
+
+Spring Security then compares:
+Password sent in the request (plain text)
+
+
+Password stored in the database (encoded with BCrypt)
+
+
+passwordEncoder.matches(rawPasswordFromRequest, encodedPasswordFromDB)
+
+If it matches → authentication succeeds.
+
+
+If not → authentication fails.
+
+
+This happens automatically—your code doesn’t need to manually check the password.
+
+Once authenticated:
+Spring Security creates a SecurityContext that stores the authenticated user details.
+
+
+Access to endpoints is controlled by your configuration:
+
+
+.anyRequest().authenticated()
+
+So now, your request can proceed to the controller/service.
+
+
+You can also check roles with annotations like @PreAuthorize("hasRole('ADMIN')").
