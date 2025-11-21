@@ -11,6 +11,7 @@ import org.marouane.supplychainx2.supplier.mapper.ISupplierMapper;
 import org.marouane.supplychainx2.supplier.service.ISupplierService;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ public class SupplierController {
 
 
     @PostMapping
+    @PreAuthorize("hasRole('GESTIONNAIRE_APPROVISIONNEMENT')")
     public ResponseEntity<?> create(@Valid @RequestBody SupplierDTO supplierDTO, BindingResult result){
 
         return ResponseEntity.ok(supplierService.createSupplier(supplierDTO));
@@ -36,6 +38,8 @@ public class SupplierController {
 
 
     @GetMapping("/id/{id}")
+    @PreAuthorize("hasRole('RESPONSABLE_ACHATS')")
+
     public ResponseEntity<?> getById(@PathVariable("id") Long id){
         SupplierDTOResponse supplierDTOResponse = supplierService.getSupplierById(id);
         return ResponseEntity.ok(supplierDTOResponse);
@@ -43,6 +47,7 @@ public class SupplierController {
 
 
     @PutMapping("/update/id/{id}")
+    @PreAuthorize("hasRole('GESTIONNAIRE_APPROVISIONNEMENT')")
     public ResponseEntity<?> update(@Valid @PathVariable("id") Long id, @RequestBody SupplierDTO supplierDTO, BindingResult result){
         SupplierDTO supplier = supplierService.updateSupplier(supplierDTO, id);
         return  ResponseEntity.ok(supplier);
@@ -55,6 +60,7 @@ public class SupplierController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('SUPERVISEUR_LOGISTIQUE')")
     public ResponseEntity<List<SupplierDTOResponse>> getAll(){
         List<SupplierDTOResponse> suppliers = supplierService.getAllSuplliers();
         return ResponseEntity.ok(suppliers);

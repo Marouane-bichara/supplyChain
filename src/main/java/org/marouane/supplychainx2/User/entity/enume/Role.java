@@ -1,0 +1,14 @@
+package org.marouane.supplychainx2.User.entity.enume;
+
+public enum Role {
+    GESTIONNAIRE_APPROVISIONNEMENT,
+    RESPONSABLE_ACHATS,
+            SUPERVISEUR_LOGISTIQUE,
+    CHEF_PRODUCTION,
+            PLANIFICATEUR,
+    SUPERVISEUR_PRODUCTION,
+            GESTIONNAIRE_COMMERCIAL,
+    RESPONSABLE_LOGISTIQUE,
+            SUPERVISEUR_LIVRAISONS,
+    ADMIN
+}

@@ -4,13 +4,17 @@ package org.marouane.supplychainx2.Production.service.Impl;
 import lombok.AllArgsConstructor;
 import org.marouane.supplychainx2.Production.DTO.ProductionOrderDTO;
 import org.marouane.supplychainx2.Production.DTO.response.productionOrder.ProductionOrderDTOResponse;
+import org.marouane.supplychainx2.Production.entity.BillOfMaterial;
 import org.marouane.supplychainx2.Production.entity.Product;
 import org.marouane.supplychainx2.Production.entity.ProductionOrder;
 import org.marouane.supplychainx2.Production.mapper.IProductionOrderMapper;
 import org.marouane.supplychainx2.Production.repository.IProductRepository;
 import org.marouane.supplychainx2.Production.repository.IProductionOrderRepository;
 import org.marouane.supplychainx2.Production.service.IProductionOrderService;
+import org.marouane.supplychainx2.supplier.entity.RawMaterial;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @AllArgsConstructor
 @Service
@@ -26,8 +30,24 @@ public class ProductionOrderServiceImpl implements IProductionOrderService {
         Product product = productRepository.findById(productionOrderDTO.getProduct_id())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
+
+
         ProductionOrder productionOrder = productionOrderMapper.toEntity(productionOrderDTO);
         productionOrder.setProduct(product);
+
+        List<BillOfMaterial> billOfMaterials = product.getBillOfMaterials();
+
+
+        for (BillOfMaterial b : billOfMaterials)
+        {
+            int quantity = b.getQuantity();
+
+            RawMaterial rawMaterial = b.getRawMaterial();
+
+            rawMaterial.setStock(rawMaterial.getStock()-quantity);
+
+
+        }
 
         ProductionOrder savedOrder = productionOrderRepository.save(productionOrder);
         return productionOrderMapper.toResponseDto(savedOrder);

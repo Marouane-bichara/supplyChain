@@ -19,7 +19,7 @@ public class RawMaterialSupplyOrder {
     private Integer quantity;
 
     @ManyToOne
-    @JoinColumn(name = "raw_material_id")
+    @JoinColumn(name      = "raw_material_id")
     private RawMaterial rawMaterial;
 
     @ManyToOne
