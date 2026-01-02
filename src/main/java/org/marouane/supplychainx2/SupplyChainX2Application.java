@@ -14,11 +14,11 @@ public class SupplyChainX2Application {
         SpringApplication.run(SupplyChainX2Application.class, args);
     }
 
-    @Bean
-    CommandLineRunner start(AccountServiceImpl accountService) {
-        return args -> {
-            accountService.addNewUser("marouane", "bichara", "marouanebichara08@gmail.com" , "12345678" , Role.ADMIN);
-        };
-    }
+//    @Bean
+//    CommandLineRunner start(AccountServiceImpl accountService) {
+//        return args -> {
+//            accountService.addNewUser("marouane", "bichara", "marouanebichara08@gmail.com" , "12345678" , Role.ADMIN);
+//        };
+//    }
 
 }

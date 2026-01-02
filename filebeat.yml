@@ -1,0 +1,13 @@
+filebeat.autodiscover:
+  providers:
+    - type: docker
+      hints.enabled: true
+      hints.default_config:
+        type: container
+        paths:
+          - /var/lib/docker/containers/${data.container.id}/*.log
+
+output.logstash:
+  hosts: ["logstash:5000"]
+
+logging.level: info

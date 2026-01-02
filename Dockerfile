@@ -1,6 +1,6 @@
 FROM eclipse-temurin:17-jdk-jammy
 
-LABEL maintainer="foullane"
+LABEL maintainer="marouane"
 EXPOSE 7070
 
 WORKDIR /app
