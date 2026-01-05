@@ -19,18 +19,7 @@ public class AccountServiceImpl implements IAccountService {
     private PasswordEncoder passwordEncoder;
 
 
-    public User addNewUser(String firstName , String lastName , String email , String password , Role role)
-    {
-        String encodedPassword = passwordEncoder.encode(password);
-        User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setEmail(email);
-        user.setRole(role);
-        user.setPassword(encodedPassword);
 
-        return userRepository.save(user);
-    }
 
     public  User loadUserByUserEmail(String email){
         return userRepository.findUserByEmail(email);

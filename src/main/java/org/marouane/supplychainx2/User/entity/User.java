@@ -1,10 +1,8 @@
 package org.marouane.supplychainx2.User.entity;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 import org.marouane.supplychainx2.User.entity.enume.Role;
-
 
 @Getter
 @Setter
@@ -12,6 +10,7 @@ import org.marouane.supplychainx2.User.entity.enume.Role;
 @NoArgsConstructor
 @Builder
 @Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -25,10 +24,9 @@ public class User {
     @Column(unique = true, length = 255)
     private String email;
 
-    private String password;
+    @Column(unique = true, nullable = false)
+    private String keycloakId;
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
-
 }

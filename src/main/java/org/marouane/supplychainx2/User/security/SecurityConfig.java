@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -37,55 +38,28 @@ public class SecurityConfig {
 
     }
 
-
     @Bean
-    public UserDetailsService userDetailsService(AccountServiceImpl accountService) {
-        return email -> {
-            User appUser = accountService.loadUserByUserEmail(email);
-            if (appUser == null) throw new UsernameNotFoundException("User not found");
-
-            return org.springframework.security.core.userdetails.User
-                    .withUsername(appUser.getEmail())
-                    .password(appUser.getPassword())
-                    .roles(appUser.getRole().name())
-                    .build();
-        };
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
-
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   JwtAuthenticationFilter jwtFilter) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-
-                        .requestMatchers(
-                                "/public",
-                                "/auth/**",
-
-
-                                "/swagger-ui/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/me").authenticated()
+                        .anyRequest().permitAll()
                 )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .oauth2ResourceServer(resourceServer ->
+                        resourceServer.jwt(jwt -> {
+                            JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+                            jwt.jwtAuthenticationConverter(converter);
+                        })
+                );
 
         return http.build();
     }
 
 
-
-
 }
+
+
+
+
+
