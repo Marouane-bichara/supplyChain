@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.marouane.supplychainx2.User.entity.enume.Role;
 
+import java.util.Set;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -29,4 +31,8 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles;
 }

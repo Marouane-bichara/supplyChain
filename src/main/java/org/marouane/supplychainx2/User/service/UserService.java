@@ -7,6 +7,8 @@ import org.marouane.supplychainx2.User.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -14,22 +16,31 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-
-
-    public User findOrCreate(String keycloakId, String email, String firstName, String lastName, List<String> roles) {
+    public User findOrCreate(String keycloakId, String email, String firstName, String lastName, List<String> jwtRoles) {
 
         return userRepository.findByKeycloakId(keycloakId)
                 .orElseGet(() -> {
+                    if (jwtRoles == null || jwtRoles.isEmpty()) {
+                        throw new IllegalArgumentException("User roles are missing in JWT");
+                    }
+
+                    Set<Role> roles = jwtRoles.stream()
+                            .map(role -> {
+                                try {
+                                    return Role.valueOf(role);
+                                } catch (IllegalArgumentException e) {
+                                    throw new IllegalArgumentException("Invalid role from JWT: " + role);
+                                }
+                            })
+                            .collect(Collectors.toSet());
+
                     User user = new User();
                     user.setKeycloakId(keycloakId);
                     user.setEmail(email);
                     user.setFirstName(firstName != null ? firstName : email);
                     user.setLastName(lastName != null ? lastName : "");
-                    if (roles != null && !roles.isEmpty()) {
-                        user.setRole(Role.valueOf(roles.get(0)));
-                    } else {
-                        user.setRole(Role.GESTIONNAIRE_APPROVISIONNEMENT);
-                    }
+                    user.setRoles(roles);
+
                     return userRepository.save(user);
                 });
     }
