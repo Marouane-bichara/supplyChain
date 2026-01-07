@@ -1,41 +1,121 @@
-version: "3.8"
-
 services:
-  db:
-    container_name: SupplyChainX2
+  # ---------------------------------------------------
+  # MYSQL
+  # ---------------------------------------------------
+  mysql:
     image: mysql:8.0
-    restart: always
+    container_name: supplychainx-mysql
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: SupplyChainX2
+      MYSQL_DATABASE: supplychainx
       MYSQL_USER: myuser
-      MYSQL_PASSWORD: myuserpassword
-    ports:
-      - "3306:3306"
+      MYSQL_PASSWORD: mypassword
+      MYSQL_ROOT_PASSWORD: root
     volumes:
-      - db_data:/var/lib/mysql
+      - mysql_data:/var/lib/mysql
     networks:
-      - mynetwork
+      - supplychainx-network
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
+  # ---------------------------------------------------
+  # PHPMYADMIN
+  # ---------------------------------------------------
   phpmyadmin:
     image: phpmyadmin:latest
+    container_name: supplychainx-phpmyadmin
     restart: always
     ports:
       - "8089:80"
     environment:
-      PMA_HOST: db
+      PMA_HOST: mysql
       PMA_USER: root
       PMA_PASSWORD: root
-      PMA_ARBITRARY: 1
-      UPLOAD_LIMIT: 1024M
-      MEMORY_LIMIT: 1024M
-      MAX_EXECUTION_TIME: 300
+    depends_on:
+      mysql:
+        condition: service_healthy
     networks:
-      - mynetwork
+      - supplychainx-network
 
+  # ---------------------------------------------------
+  # ELASTICSEARCH
+  # ---------------------------------------------------
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.1
+    container_name: elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - supplychainx-network
+
+  # ---------------------------------------------------
+  # LOGSTASH
+  # ---------------------------------------------------
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.1
+    container_name: logstash
+    volumes:
+      - ./logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+    ports:
+      - "5000:5000"
+      - "9600:9600"
+    depends_on:
+      - elasticsearch
+    networks:
+      - supplychainx-network
+
+  # ---------------------------------------------------
+  # KIBANA
+  # ---------------------------------------------------
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.1
+    container_name: kibana
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - supplychainx-network
+
+  # ---------------------------------------------------
+  # FILEBEAT
+  # ---------------------------------------------------
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.11.1
+    container_name: filebeat
+    user: root
+    command: ["-e", "--strict.perms=false"]
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - logstash
+    networks:
+      - supplychainx-network
+
+# ---------------------------------------------------
+# VOLUMES
+# ---------------------------------------------------
 volumes:
-  db_data:
+  mysql_data:
+  elasticsearch_data:
 
+# ---------------------------------------------------
+# NETWORK
+# ---------------------------------------------------
 networks:
-  mynetwork:
+  supplychainx-network:
     driver: bridge
