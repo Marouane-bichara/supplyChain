@@ -1,9 +1,12 @@
 package org.marouane.supplychainx2.User.repository;
 
+
 import org.marouane.supplychainx2.User.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends JpaRepository<User , Long> {
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
     User findUserByFirstName(String name);
     User findUserByEmail(String email);
 }
